@@ -80,8 +80,9 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Kernel\DatabaseConnection.cs" />
-    <Compile Include="Kernel\NotifyProperty.cs" />
+    <Compile Include="Helpers\DatabaseConnection.cs" />
+    <Compile Include="Helpers\NotifyProperty.cs" />
+    <Compile Include="Helpers\SqlHelper.cs" />
     <Compile Include="ViewModel\MainWindowVM.cs" />
     <Compile Include="View\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -93,10 +94,10 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Model\DataGridModel.cs" />
-    <Compile Include="Model\NavigationModel.cs" />
-    <Compile Include="Model\PanelModel.cs" />
-    <Compile Include="Model\TableModel.cs" />
+    <Compile Include="Models\DataGridModel.cs" />
+    <Compile Include="Models\NavigationModel.cs" />
+    <Compile Include="Models\PanelModel.cs" />
+    <Compile Include="Models\TableModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -114,6 +115,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="Public\ClassDiagram1.cd" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

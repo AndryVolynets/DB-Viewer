@@ -3,7 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Teach" xmlns:viewmodel="clr-namespace:Teach.ViewModel" d:DataContext="{d:DesignInstance Type=viewmodel:MainWindowVM}"
+        xmlns:viewmodel="clr-namespace:Teach.ViewModel" 
+        d:DataContext="{d:DesignInstance Type=viewmodel:MainWindowVM}"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="600">
 
@@ -22,8 +23,9 @@
                  Grid.Column="0" 
                  Margin="5"
                  ItemsSource="{Binding Tables}"
-                  SelectedItem="{Binding SelectedTable}"
-                 DisplayMemberPath="Name"/>
+                 DisplayMemberPath="Name"
+                 SelectedItem="{Binding SelectedTable, Mode=TwoWay}"
+                 />
 
         <!-- Область для отображения таблицы -->
         <Grid Grid.Column="1">
@@ -36,7 +38,7 @@
             <!-- Верхняя панель для выбора и поиска данных -->
             <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="5">
                 <TextBox x:Name="SearchBox" 
-                         Text="{Binding SearchTerm, UpdateSourceTrigger=PropertyChanged}"
+                         Text="{Binding SearchTerm}"
                          Width="150" 
                          Margin="0,0,5,0" />
                 <Button Content="Search" 
@@ -55,22 +57,30 @@
 
             <!-- Область для отображения данных таблицы -->
             <TabControl Grid.Row="1" ItemsSource="{Binding OpenedTabs}" 
-                        SelectedIndex="{Binding SelectedTabIndex}" Margin="5">
+            SelectedIndex="{Binding SelectedTabIndex}" Margin="5">
                 <TabControl.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding Tables, UpdateSourceTrigger=PropertyChanged}" />
-                            <Button Content="X" Command="{Binding CloseTabCommand}" Margin="5,0,0,0" />
+                            <TextBlock Text="{Binding TabName}" />
+                            <Button Command="{Binding CloseTabCommand}" 
+                                    Margin="5,0,0,0" 
+                                    FontSize="12"
+                                    Height="20"
+                                    Width="20"
+                                    >
+                                х
+                            </Button>
                         </StackPanel>
                     </DataTemplate>
                 </TabControl.ItemTemplate>
                 <TabControl.ContentTemplate>
                     <DataTemplate>
-                        <DataGrid ItemsSource="{Binding Data}" AutoGenerateColumns="True" />
+                        <DataGrid ItemsSource="{Binding Data}" 
+                      AutoGenerateColumns="True" />
                     </DataTemplate>
                 </TabControl.ContentTemplate>
             </TabControl>
-            
+
             <!-- Нижняя панель навигации -->
             <StackPanel Grid.Row="2" 
                         Orientation="Horizontal" 

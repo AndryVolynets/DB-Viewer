@@ -5,20 +5,31 @@ using System.Data.Common;
 using System.Data.SqlClient;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Documents;
 using Teach.Kernel;
 
 namespace Teach.Model
 {
     internal class TableModel : NotifyProperty
     {
-        public string Tables 
+        public string Name
         { 
-            get => _tables; 
+            get => _tableName; 
             set 
             { 
-                _tables = value;
-                OnPropertyChanged(nameof(Tables)); 
+                _tableName = value;
+                OnPropertyChanged("Tables"); 
             } 
+        }
+
+        public TableModel SelectedTable
+        {
+            get { return _selectedTable; }
+            set
+            {
+                _selectedTable = value;
+                OnPropertyChanged("SelectedTable");
+            }
         }
 
         public static ObservableCollection<TableModel> GetTables()
@@ -35,22 +46,23 @@ namespace Teach.Model
                     while (reader.Read())
                     {
                         int columnNumber = reader.GetOrdinal("TABLE_NAME");
-                        tables.Add(new TableModel { Tables = reader.GetString(columnNumber) });
+                        tables.Add(new TableModel { Name = reader.GetString(columnNumber) });
                     }
                 }
             }
             catch (SqlException ex)
             {
-                MessageBox.Show("Error selecting tables from database: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Error selecting tables from database: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error selecting tables: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Error selecting tables: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);;
             }
 
             return tables;
         }
 
-        private string _tables;
+        private string _tableName;
+        private TableModel _selectedTable;
     }
 }

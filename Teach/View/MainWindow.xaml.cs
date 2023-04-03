@@ -1,6 +1,4 @@
-﻿using System.Configuration;
-using System.Data.SqlClient;
-using System.Windows;
+﻿using System.Windows;
 using Teach.ViewModel;
 
 namespace Teach

@@ -8,6 +8,7 @@ namespace Teach.Kernel
 {
     internal sealed class DatabaseConnection : IDisposable
     {
+        #region public
         public static DatabaseConnection Instance { get { return lazy.Value; } }
 
         public SqlConnection GetConnection()
@@ -31,6 +32,10 @@ namespace Teach.Kernel
                 TryExecute(() => connection.Close());
             }
         }
+
+        #endregion
+
+        #region private
 
         private static readonly Lazy<DatabaseConnection> lazy = new Lazy<DatabaseConnection>(() => new DatabaseConnection());
         private SqlConnection connection;
@@ -84,5 +89,6 @@ namespace Teach.Kernel
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
+        #endregion
     }
 }
