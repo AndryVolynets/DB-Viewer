@@ -8,26 +8,12 @@ using System.Windows.Input;
 
 namespace Teach.Model
 {
-    internal class PanelModel : NotifyProperty
+    internal class PanelModel
     {
-        public string SearchTerm
-        {
-            get { return _searchTerm; }
-            set
-            {
-                if (_searchTerm != value)
-                {
-                    _searchTerm = value;
-                    OnPropertyChanged(nameof(SearchTerm));
-                }
-            }
-        }
-
+        public string SearchTerm { get; set; }
         public ICommand SearchCommand { get; set; }
         public ICommand AddCommand { get; set; }
         public ICommand EditCommand { get; set; }
         public ICommand DeleteCommand { get; set; }
-
-        private string _searchTerm;
     }
 }

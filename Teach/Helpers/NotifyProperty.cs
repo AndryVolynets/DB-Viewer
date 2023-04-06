@@ -7,9 +7,16 @@ namespace Teach.Model
     internal abstract class NotifyProperty : INotifyPropertyChanged
     {
         public virtual event PropertyChangedEventHandler PropertyChanged;
-        public virtual void OnPropertyChanged(string prop = "")
+        public virtual bool SetProperty<T>(ref T field, T newValue, [CallerMemberName] string propertyName = null)
         {
-            PropertyChanged?.Invoke(sender: this, e: new PropertyChangedEventArgs(propertyName: prop));
+            if (!Equals(field, newValue))
+            {
+                field = newValue;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+                return true;
+            }
+            return false;
         }
+
     }
 }

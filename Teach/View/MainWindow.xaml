@@ -6,26 +6,61 @@
         xmlns:viewmodel="clr-namespace:Teach.ViewModel" 
         d:DataContext="{d:DesignInstance Type=viewmodel:MainWindowVM}"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="600">
+        Title="MainWindow" Height="550" Width="800"
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center">
 
     <Window.Resources>
         <ResourceDictionary Source="/Public/styles.xaml"/>
     </Window.Resources>
-    
+
     <!-- Левая панель с списком таблиц -->
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="auto"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="150"/>
+            <ColumnDefinition/>
         </Grid.ColumnDefinitions>
 
-        <ListBox x:Name="TablesList" 
+        <TreeView>
+            <TreeViewItem Header="Таблиці">
+                <ListBox x:Name="TablesList" 
                  Grid.Column="0" 
                  Margin="5"
                  ItemsSource="{Binding Tables}"
                  DisplayMemberPath="Name"
                  SelectedItem="{Binding SelectedTable, Mode=TwoWay}"
                  />
+            </TreeViewItem>
+            <TreeViewItem Header="Процедури">
+
+                <TreeViewItem.ContextMenu>
+                    <ContextMenu>
+                        <ListBox ItemsSource="{Binding ProcedureParameters}"
+                                  SelectedItem="{Binding SelectedTable, Mode=TwoWay}"
+                                 />
+                        <Button Content="Submit" Command="{Binding SearchCommand}" />
+                    </ContextMenu>
+                </TreeViewItem.ContextMenu>
+
+                <ListBox x:Name="ProcedureList" 
+                         Grid.Column="0" 
+                         Margin="5"
+                         ItemsSource="{Binding Procedures}"
+                         DisplayMemberPath="Name"
+                         SelectedItem="{Binding SelectedProcedure, Mode=TwoWay}"
+                         />
+
+            </TreeViewItem>
+
+            <ProgressBar Height="20" 
+                     Width="140" 
+                     Margin="-17 10 0 0"
+                     VerticalAlignment="Center"
+                     Value="{Binding ProgressValue}" 
+                     Minimum="0" 
+                     Maximum="100" />
+        </TreeView>
+
 
         <!-- Область для отображения таблицы -->
         <Grid Grid.Column="1">
@@ -37,13 +72,6 @@
 
             <!-- Верхняя панель для выбора и поиска данных -->
             <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="5">
-                <TextBox x:Name="SearchBox" 
-                         Text="{Binding SearchTerm}"
-                         Width="150" 
-                         Margin="0,0,5,0" />
-                <Button Content="Search" 
-                        Command="{Binding SearchCommand}" />
-
                 <Button Content="Add" 
                         Command="{Binding AddCommand}" 
                         Margin="5,0,5,0" />
@@ -55,20 +83,20 @@
                         Margin="0,0,5,0" />
             </StackPanel>
 
-            <!-- Область для отображения данных таблицы -->
-            <TabControl Grid.Row="1" ItemsSource="{Binding OpenedTabs}" 
-            SelectedIndex="{Binding SelectedTabIndex}" Margin="5">
+            <TextBox Text="{Binding SearchTerm, UpdateSourceTrigger=PropertyChanged}" Margin="5"/>
+            <TabControl Grid.Row="1" ItemsSource="{Binding OpenedTabs}" SelectedIndex="{Binding SelectedTabIndex}" Margin="5">
                 <TabControl.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{Binding TabName}" />
-                            <Button Command="{Binding CloseTabCommand}" 
+                            <Button Command="{Binding DataContext.CloseTabCommand, 
+                                              RelativeSource={RelativeSource AncestorType={x:Type TabControl}}}"
+                                    CommandParameter="{Binding}"
                                     Margin="5,0,0,0" 
                                     FontSize="12"
                                     Height="20"
-                                    Width="20"
-                                    >
-                                х
+                                    Width="20">
+                                x
                             </Button>
                         </StackPanel>
                     </DataTemplate>
@@ -86,13 +114,13 @@
                         Orientation="Horizontal" 
                         Margin="5"
                         HorizontalAlignment="Center">
-               
+
                 <!-- Панель кнопок навигации -->
-                    <Button Content="First" Command="{Binding FirstPageCommand}" Margin="0,0,5,0" />
-                    <Button Content="Previous" Command="{Binding PreviousPageCommand}" Margin="0,0,5,0" />
-                    <Button Content="Next" Command="{Binding NextPageCommand}" Margin="0,0,5,0" />
-                    <Button Content="Last" Command="{Binding LastPageCommand}" Margin="0,0,5,0" />
-                
+                <Button Content="First" Command="{Binding FirstPageCommand}" Margin="0,0,5,0" />
+                <Button Content="Previous" Command="{Binding PreviousPageCommand}" Margin="0,0,5,0" />
+                <Button Content="Next" Command="{Binding NextPageCommand}" Margin="0,0,5,0" />
+                <Button Content="Last" Command="{Binding LastPageCommand}" Margin="0,0,5,0" />
+
             </StackPanel>
         </Grid>
     </Grid>
