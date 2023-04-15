@@ -10,6 +10,7 @@ using Teach.Helpers;
 using Teach.Model;
 using Teach.Kernel;
 using Teach.Models.Interfaces;
+using Dapper;
 
 namespace Teach.Models.MainWindowModels
 {
@@ -20,8 +21,7 @@ namespace Teach.Models.MainWindowModels
         {
             return DatabaseConnection.Instance.SelectBy(query: "SELECT name FROM sys.procedures", type: "name");
         }
-        
-        public static DataTable GetTableFromProcedure(string procedureName, SqlParameter[] parameters = null)
+        public static DataTable GetTableFromProcedure(string procedureName, DynamicParameters parameters = null)
         {
             DataTable dataTable = new DataTable();
 
@@ -29,33 +29,10 @@ namespace Teach.Models.MainWindowModels
             {
                 using (var connection = DatabaseConnection.Instance.GetConnection())
                 {
-                    using (var command = new SqlCommand(procedureName, connection))
-                    {
-                        command.CommandType = CommandType.StoredProcedure;
-
-                        SqlCommandBuilder.DeriveParameters(command);
-                        if (parameters != null && parameters.Length > 0)
-                        {
-                            foreach (var parameter in parameters)
-                            {
-                                if (!command.Parameters.Contains(parameter.ParameterName))
-                                {
-                                    throw new ArgumentException($"Procedure '{procedureName}' does not have parameter '{parameter.ParameterName}'");
-                                }
-                                else
-                                {
-                                    command.Parameters[parameter.ParameterName].Value = parameter.Value;
-                                }
-                            }
-                        }
-
-                        using (var reader = command.ExecuteReader())
-                        {
-                            dataTable.Load(reader);
-                        }
-                    }
+                    dataTable.Load(connection.ExecuteReader(procedureName, parameters, commandType: CommandType.StoredProcedure));
                 }
             });
+
             return dataTable;
         }
     }

@@ -69,28 +69,19 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
-
-            <!-- Верхняя панель для выбора и поиска данных -->
-            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="5">
-                <Button Content="Add" 
-                        Command="{Binding AddCommand}" 
-                        Margin="5,0,5,0" />
-                <Button Content="Edit" 
-                        Command="{Binding EditCommand}" 
-                        Margin="0,0,5,0" />
-                <Button Content="Delete" 
-                        Command="{Binding DeleteCommand}" 
-                        Margin="0,0,5,0" />
-            </StackPanel>
-
-            <TextBox Text="{Binding SearchTerm, UpdateSourceTrigger=PropertyChanged}" Margin="5"/>
-            <TabControl Grid.Row="1" ItemsSource="{Binding OpenedTabs}" SelectedIndex="{Binding SelectedTabIndex}" Margin="5">
+           
+            <TabControl Grid.Row="1" 
+                        x:Name="TabControl" 
+                        ItemsSource="{Binding OpenedTabs}" 
+                        SelectedIndex="{Binding SelectedTabIndex}" 
+                        Margin="5">
                 <TabControl.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{Binding TabName}" />
                             <Button Command="{Binding DataContext.CloseTabCommand, 
-                                              RelativeSource={RelativeSource AncestorType={x:Type TabControl}}}"
+                                              RelativeSource={RelativeSource AncestorType={x:Type TabControl}}
+                                              }"
                                     CommandParameter="{Binding}"
                                     Margin="5,0,0,0" 
                                     FontSize="12"
@@ -103,8 +94,9 @@
                 </TabControl.ItemTemplate>
                 <TabControl.ContentTemplate>
                     <DataTemplate>
-                        <DataGrid ItemsSource="{Binding Data}" 
-                      AutoGenerateColumns="True" />
+                        <DataGrid x:Name="MyDataGrid"
+                                  ItemsSource="{Binding Data}"
+                                  AutoGenerateColumns="True"/>
                     </DataTemplate>
                 </TabControl.ContentTemplate>
             </TabControl>
@@ -120,6 +112,9 @@
                 <Button Content="Previous" Command="{Binding PreviousPageCommand}" Margin="0,0,5,0" />
                 <Button Content="Next" Command="{Binding NextPageCommand}" Margin="0,0,5,0" />
                 <Button Content="Last" Command="{Binding LastPageCommand}" Margin="0,0,5,0" />
+                <TextBox Text="{Binding SearchTerm, UpdateSourceTrigger=PropertyChanged}" Margin="0"/>
+                <Button Content="Search" Command="{Binding SearchPageCommand}" Margin="0,0,5,0" />
+                <Button Content="Save" Command="{Binding SavePageCommand}" Margin="0,0,5,0" />
 
             </StackPanel>
         </Grid>

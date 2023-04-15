@@ -17,6 +17,10 @@ using System.Collections.Generic;
 using System.Windows.Data;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Security.Cryptography;
+using System.Windows.Media.Animation;
+using System.Windows.Controls;
+
 
 namespace Teach.ViewModel
 {
@@ -30,23 +34,34 @@ namespace Teach.ViewModel
             ProcedureParameters = new List<ProcedureModel>();
 
             CloseTabCommand = new RelayCommand<object>(CloseTab);
-        }
+            SavePageCommand = new RelayCommand<object>(SaveTab);
 
+            tabControl.SelectionChanged += OnSelectedTabChanged;
+        }
 
         public ObservableCollection<TableModel> Tables { get; set; }
         public ObservableCollection<TableModel> Procedures { get; set; }
-        public ObservableCollection<DataGridModel> OpenedTabs { get; set; }
         public List<ProcedureModel> ProcedureParameters { get; set; }
 
+        /// <summary>
+        /// DataGrid binding
+        /// </summary>
+        public ObservableCollection<DataGridModel> OpenedTabs { get; set; }
+        
 
         public ICommand SearchCommand { get; set; }
         public ICommand CloseTabCommand { get; set; }
+        public ICommand SavePageCommand { get; set; }
 
 
         public int SelectedTabIndex
         {
-            get => _selectedTabIndex; 
-            set => SetProperty(ref _selectedTabIndex, value);    
+            get => _selectedTabIndex;
+            set
+            {
+                if (_selectedTabIndex != value)
+                    SetProperty(ref _selectedTabIndex, value);
+            }
         }
 
         public string SearchTerm
@@ -108,21 +123,16 @@ namespace Teach.ViewModel
                         }
                         else
                         {
-                            LoadProcedureParameters(command.Parameters);
+                            for (var i = 0; i < command.Parameters.Count; i++)
+                            {
+                                ProcedureParameters.Add(new ProcedureModel { Value = command.Parameters[i].ParameterName });
+                            }
                         }
 
                         OpenedTabs.Add(new DataGridModel { TabName = procedureName, Data = dataTable });
                     }
                 }
             });
-        }
-
-        private void LoadProcedureParameters(SqlParameterCollection parameters)
-        {
-            for (var i = 0; i < parameters.Count; i++)
-            {
-                ProcedureParameters.Add(new ProcedureModel { Value = parameters[i].ParameterName });
-            }
         }
 
         private void CloseTab(object obj)
@@ -133,9 +143,40 @@ namespace Teach.ViewModel
             }
         }
 
+        private void SaveTab(object obj)
+        {
+            
+        }
+
+        private void OnSelectedTabChanged(object sender, RoutedEventArgs e)
+        {
+            if (sender is TabControl tabControl)
+            {
+                if (tabControl.SelectedIndex >= 0)
+                {
+                    _curentDataGrid = OpenedTabs[tabControl.SelectedIndex];
+                }
+            }
+        }
+
+        private void SaveChanges(DataGridModel dataGridModel)
+        {
+            using (var connection = DatabaseConnection.Instance.GetConnection())
+            {
+                var command = new SqlCommand($"SELECT * FROM {dataGridModel.TabName}", connection);
+                var adapter = new SqlDataAdapter(command);
+                var builder = new SqlCommandBuilder(adapter);
+                adapter.Update(dataGridModel.Data);
+            }
+        }
+
+        private DataGridModel _curentDataGrid;
+
         private int _selectedTabIndex;
         private TableModel _selectedTable;
         private TableModel _selectedProcedure;
         private string searchTerm;
+
+        private readonly TabControl tabControl = Application.Current.MainWindow.FindName("TabControl") as TabControl;
     }
 }

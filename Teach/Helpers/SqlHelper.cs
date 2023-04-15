@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Dapper;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Data.SqlTypes;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,42 +32,32 @@ namespace Teach.Helpers
                 {
                     MessageBox.Show($"Error selecting tables from database: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
+                catch (SqlTypeException ex)
+                {
+                    MessageBox.Show($"Error selecting tables from database: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
                 catch (Exception ex)
                 {
                     MessageBox.Show($"Error selecting tables: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error); ;
                 }
             }
         }
+
         public static ObservableCollection<TableModel> SelectBy(this DatabaseConnection instance, string query, string type)
         {
-            var tables = new ObservableCollection<TableModel>();
+            instance.TryCatch(() => { });
 
-            if (instance is null)
+            if (string.IsNullOrEmpty(query) || string.IsNullOrEmpty(type))
             {
-                throw new ArgumentNullException(nameof(instance));
+                return new ObservableCollection<TableModel>();
             }
-            if (!(string.IsNullOrEmpty(query) && string.IsNullOrEmpty(type)))
+            else
             {
-                instance.TryCatch(() =>
+                using (var connection = instance.GetConnection())
                 {
-                    using (var connection = instance.GetConnection())
-                    {
-                        using (var command = new SqlCommand(query, connection))
-                        {
-                            using (var reader = command.ExecuteReader())
-                            {
-                                int columnNumber = reader.GetOrdinal(type);
-                                while (reader.Read())
-                                {
-                                    tables.Add(new TableModel { Name = reader.GetString(columnNumber) });
-                                }
-                            }
-                        }
-                    }
-                });
+                    return new ObservableCollection<TableModel>(connection.Query<TableModel>($"SELECT {type} AS Name FROM ({query}) T"));
+                }
             }
-            return tables;
         }
-
     }
 }
