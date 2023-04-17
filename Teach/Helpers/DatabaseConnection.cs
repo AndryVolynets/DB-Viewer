@@ -8,20 +8,20 @@ namespace Teach.Kernel
 {
     internal sealed class DatabaseConnection : IDisposable
     {
-        #region public
-        public static DatabaseConnection Instance { get { return lazy.Value; } }
+        private static readonly Lazy<DatabaseConnection> lazy = new Lazy<DatabaseConnection>(() => new DatabaseConnection());
+        private SqlConnection connection;
+        private string connectionString;
+        private bool disposedValue;
+
+        public static DatabaseConnection Instance => lazy.Value;
 
         public SqlConnection GetConnection()
         {
             if (connection == null || connection.State != ConnectionState.Open)
             {
-                TryExecute(() =>
-                {
-                    connection = new SqlConnection(connectionString);
-                    connection.Open();
-                });
+                connection = new SqlConnection(connectionString);
+                connection.Open();
             }
-
             return connection;
         }
 
@@ -29,40 +29,17 @@ namespace Teach.Kernel
         {
             if (connection != null && connection.State == ConnectionState.Open)
             {
-                TryExecute(() => connection.Close());
+                connection.Close();
             }
         }
 
-        #endregion
-
-        #region private
-
-        private static readonly Lazy<DatabaseConnection> lazy = new Lazy<DatabaseConnection>(() => new DatabaseConnection());
-        private SqlConnection connection;
-        private string connectionString;
-
-        private bool disposedValue;
-
         private DatabaseConnection()
         {
-            TryExecute(() =>
+            try
             {
                 connectionString = ConfigurationManager.ConnectionStrings["DatabaseConnect"].ConnectionString;
                 connection = new SqlConnection(connectionString);
                 connection.Open();
-            });
-        }
-
-        ~DatabaseConnection()
-        {
-            Dispose(disposing: false);
-        }
-
-        private void TryExecute(Action action)
-        {
-            try
-            {
-                action();
             }
             catch (SqlException ex)
             {
@@ -84,11 +61,10 @@ namespace Teach.Kernel
             }
         }
 
-        void IDisposable.Dispose()
+        public void Dispose()
         {
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
-        #endregion
     }
 }

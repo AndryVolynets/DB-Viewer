@@ -23,6 +23,7 @@ namespace Teach
         public MainWindow()
         {
             InitializeComponent();
+            WindowStartupLocation = WindowStartupLocation.CenterScreen;
             DataContext = new MainWindowVM();
         }
     }

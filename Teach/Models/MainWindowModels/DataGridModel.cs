@@ -20,5 +20,6 @@ namespace Teach.Model
         public string TabName { get; set; }
 
         public DataTable Data { get; set; }
+
     }
 }

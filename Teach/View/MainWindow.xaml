@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewmodel="clr-namespace:Teach.ViewModel" 
         d:DataContext="{d:DesignInstance Type=viewmodel:MainWindowVM}"
-        mc:Ignorable="d"
+        mc:Ignorable="d"   
         Title="MainWindow" Height="550" Width="800"
         HorizontalAlignment="Center"
         VerticalAlignment="Center">
@@ -17,7 +17,7 @@
     <!-- Левая панель с списком таблиц -->
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="150"/>
+            <ColumnDefinition Width="200"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
 
@@ -51,17 +51,7 @@
                          />
 
             </TreeViewItem>
-
-            <ProgressBar Height="20" 
-                     Width="140" 
-                     Margin="-17 10 0 0"
-                     VerticalAlignment="Center"
-                     Value="{Binding ProgressValue}" 
-                     Minimum="0" 
-                     Maximum="100" />
         </TreeView>
-
-
         <!-- Область для отображения таблицы -->
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
@@ -69,7 +59,7 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
-           
+
             <TabControl Grid.Row="1" 
                         x:Name="TabControl" 
                         ItemsSource="{Binding OpenedTabs}" 
@@ -94,9 +84,13 @@
                 </TabControl.ItemTemplate>
                 <TabControl.ContentTemplate>
                     <DataTemplate>
-                        <DataGrid x:Name="MyDataGrid"
-                                  ItemsSource="{Binding Data}"
-                                  AutoGenerateColumns="True"/>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <DataGrid Grid.Row="1" x:Name="MyDataGrid" ItemsSource="{Binding Data}" AutoGenerateColumns="True"/>
+                        </Grid>
                     </DataTemplate>
                 </TabControl.ContentTemplate>
             </TabControl>
@@ -108,10 +102,10 @@
                         HorizontalAlignment="Center">
 
                 <!-- Панель кнопок навигации -->
-                <Button Content="First" Command="{Binding FirstPageCommand}" Margin="0,0,5,0" />
-                <Button Content="Previous" Command="{Binding PreviousPageCommand}" Margin="0,0,5,0" />
-                <Button Content="Next" Command="{Binding NextPageCommand}" Margin="0,0,5,0" />
-                <Button Content="Last" Command="{Binding LastPageCommand}" Margin="0,0,5,0" />
+                <Button Content="First" Command="{Binding NavigationButtons.FirstPageCommand}" Margin="0,0,5,0" />
+                <Button Content="Previous" Command="{Binding NavigationButtons.PreviousPageCommand}" Margin="0,0,5,0" />
+                <Button Content="Next" Command="{Binding NavigationButtons.NextPageCommand}" Margin="0,0,5,0" />
+                <Button Content="Last" Command="{Binding NavigationButtons.LastPageCommand}" Margin="0,0,5,0" />
                 <TextBox Text="{Binding SearchTerm, UpdateSourceTrigger=PropertyChanged}" Margin="0"/>
                 <Button Content="Search" Command="{Binding SearchPageCommand}" Margin="0,0,5,0" />
                 <Button Content="Save" Command="{Binding SavePageCommand}" Margin="0,0,5,0" />
