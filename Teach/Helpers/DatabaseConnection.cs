@@ -8,9 +8,10 @@ namespace Teach.Kernel
 {
     internal sealed class DatabaseConnection : IDisposable
     {
-        private static readonly Lazy<DatabaseConnection> lazy = new Lazy<DatabaseConnection>(() => new DatabaseConnection());
+        private static readonly Lazy<DatabaseConnection> lazy = 
+            new Lazy<DatabaseConnection>(() => new DatabaseConnection());
         private SqlConnection connection;
-        private string connectionString;
+        private readonly string connectionString;
         private bool disposedValue;
 
         public static DatabaseConnection Instance => lazy.Value;
@@ -56,7 +57,9 @@ namespace Teach.Kernel
             if (!disposedValue)
             {
                 if (disposing)
+                {
                     CloseConnection();
+                }
                 disposedValue = true;
             }
         }

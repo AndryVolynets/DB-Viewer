@@ -26,10 +26,12 @@ namespace Teach.Model
             using (var connection = DatabaseConnection.Instance.GetConnection())
             {
                 var dataTable = new DataTable(tableName);
+
                 using (var reader = connection.ExecuteReader(query))
                 {
                     dataTable.Load(reader);
                 }
+
                 return dataTable;
             }
         }

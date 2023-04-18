@@ -34,8 +34,7 @@ namespace Teach.ViewModel
             };
 
             CloseTabCommand = new RelayCommand<object>(CloseTab);
-
-            tabControl.SelectionChanged += OnSelectedTabChanged;
+            SavePageCommand = new RelayCommand(SaveTab);
         }
 
         public ObservableCollection<TableModel> Tables { get; set; }
@@ -46,7 +45,6 @@ namespace Teach.ViewModel
         /// DataGrid binding
         /// </summary>
         public ObservableCollection<DataGridModel> OpenedTabs { get; set; }
-
 
         public ICommand CloseTabCommand
         {
@@ -80,7 +78,6 @@ namespace Teach.ViewModel
                 if (_selectedProcedure != value)
                 {
                     SetProperty(ref _selectedProcedure, value);
-
                     OpenInputDialogAndExecuteProcedure(value.Name);
                 }
             }
@@ -120,13 +117,13 @@ namespace Teach.ViewModel
         {
             var inputDialog = new InputDialog(paramsList.Select(x => x.Name).ToList());
 
-            if (inputDialog.ShowDialog() != true)
+            if (inputDialog.ShowDialog() == true)
             {
-                throw new ArgumentException($"Input dialog for procedure {procedureName} was cancelled.");
+                return inputDialog.ResultDict;
             }
             else
             {
-                return inputDialog.ResultDict;
+                throw new ArgumentException($"Input dialog for procedure {procedureName} was cancelled.");
             }
         }
 
@@ -137,7 +134,6 @@ namespace Teach.ViewModel
             {
                 OpenedTabs.Add(new DataGridModel { TabName = name, Data = dataTable });
             }
-            
         }
 
         private void CloseTab(object obj)
@@ -147,6 +143,7 @@ namespace Teach.ViewModel
                 OpenedTabs.Remove(tabItem);
             }
         }
+
 
         private void FirstPage()
         {
@@ -170,30 +167,45 @@ namespace Teach.ViewModel
 
         private void SaveTab()
         {
-            
+            var result = MessageBox.Show("Do you want to save changes?", 
+                                         "Save changes", 
+                                         MessageBoxButton.YesNo, 
+                                         MessageBoxImage.Question
+                                         );
+
+            if (result == MessageBoxResult.Yes)
+            {
+                if (OpenedTabs.Count == 0)
+                {
+                    MessageBox.Show("Нечего сохранять!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                else
+                {
+                    foreach (var item in OpenedTabs)
+                    {
+                        SaveChanges(item);
+                    }
+                }
+            }
         }
 
-        private void OnSelectedTabChanged(object sender, RoutedEventArgs e)
+        private void SaveChanges(DataGridModel dataGridModel)
         {
-            if (sender is TabControl tabControl)
+            using (var connection = DatabaseConnection.Instance.GetConnection())
             {
-                if (tabControl.SelectedIndex >= 0)
-                {
-                    _selectedTabIndex = tabControl.SelectedIndex;
-                    _curentDataGrid = OpenedTabs[tabControl.SelectedIndex];
-                }
+                var command = new SqlCommand($"SELECT * FROM {dataGridModel.TabName}", connection);
+                var adapter = new SqlDataAdapter(command);
+                var builder = new SqlCommandBuilder(adapter);
+                adapter.Update(dataGridModel.Data);
             }
         }
 
         public ICommand _closeTabCommand;
         public ICommand _savePageCommand;
-
-        private int _selectedTabIndex;
+        
         private TableModel _selectedTable;
         private TableModel _selectedProcedure;
-        private DataGridModel _curentDataGrid;
 
-        private readonly TabControl tabControl = Application.Current.MainWindow.FindName("TabControl") as TabControl;
         public class StoredProcedureParameter
         {
             public string Name { get; set; }
@@ -215,7 +227,7 @@ namespace Teach.ViewModel
         {
             Title = "Input";
             SizeToContent = SizeToContent.WidthAndHeight;
-            
+
             foreach (var param in parameters)
             {
                 var promptTextBlock = new TextBlock { Text = param };
@@ -250,17 +262,12 @@ namespace Teach.ViewModel
         private void OnOkButtonClick(object sender, RoutedEventArgs e)
         {
             ResultDict = new Dictionary<string, string>();
+
             for (var i = 0; i < _mainStackPanel.Children.Count; i++)
             {
-                if (_mainStackPanel.Children[i] is TextBlock textBlock && textBlock.Text != "")
-                {
-                    var paramName = textBlock.Text;
+                if (_mainStackPanel.Children[i] is TextBlock textBlock && !string.IsNullOrEmpty(textBlock.Text))
                     if (_mainStackPanel.Children[i + 1] is TextBox textBox)
-                    {
-                        var paramValue = textBox.Text;
-                        ResultDict[paramName] = paramValue;
-                    }
-                }
+                        ResultDict[textBlock.Text] = textBox.Text;
             }
             DialogResult = true;
         }
@@ -270,6 +277,4 @@ namespace Teach.ViewModel
             DialogResult = false;
         }
     }
-
-
 }

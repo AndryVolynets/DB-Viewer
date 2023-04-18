@@ -89,7 +89,11 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
-                            <DataGrid Grid.Row="1" x:Name="MyDataGrid" ItemsSource="{Binding Data}" AutoGenerateColumns="True"/>
+                            <DataGrid Grid.Row="1" 
+                                      x:Name="MyDataGrid" 
+                                      ItemsSource="{Binding Data}" 
+                                      AutoGenerateColumns="True"
+                                      />
                         </Grid>
                     </DataTemplate>
                 </TabControl.ContentTemplate>
@@ -107,7 +111,7 @@
                 <Button Content="Next" Command="{Binding NavigationButtons.NextPageCommand}" Margin="0,0,5,0" />
                 <Button Content="Last" Command="{Binding NavigationButtons.LastPageCommand}" Margin="0,0,5,0" />
                 <TextBox Text="{Binding SearchTerm, UpdateSourceTrigger=PropertyChanged}" Margin="0"/>
-                <Button Content="Search" Command="{Binding SearchPageCommand}" Margin="0,0,5,0" />
+                <Button Content="Search" Command="{Binding SearchCommand}"/>
                 <Button Content="Save" Command="{Binding SavePageCommand}" Margin="0,0,5,0" />
 
             </StackPanel>
